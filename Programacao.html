@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programação de Embarque</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        body.dark-mode input, body.dark-mode select {
+            background-color: #444;
+            color: #fff;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: background-color 0.3s;
+            margin-top: 80px; /* Aumentado para acomodar o cabeçalho maior */
+            margin-bottom: 60px; /* Altura do rodapé */
+            margin-left: 220px; /* 200px da largura do sidebar + 20px de padding */
+        }
+
+        .dark-mode .container {
+            background-color: #444;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 10px; /* Reduzir a margem inferior */
+        }
+
+        .logo img {
+            width: 60%;
+            max-width: 600px;
+            height: auto;
+        }
+
+        .logo-dark {
+            visibility: hidden;
+        }
+
+        .dark-mode .logo-light {
+            visibility: hidden;
+        }
+
+        .dark-mode .logo-dark {
+            visibility: visible;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-item label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-item input, .form-item select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        .form-item input:focus, .form-item select:focus {
+            outline: none;
+            border: 2px solid #ff6600;
+            box-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #adicionar-btn {
+            background-color: #28a745; /* Verde */
+        }
+
+        #adicionar-btn:hover {
+            background-color: #218838;
+        }
+
+        #carregar-btn {
+            background-color: #17a2b8; /* Azul céu */
+        }
+
+        #carregar-btn:hover {
+            background-color: #138496;
+        }
+
+        #toggle-mode-btn {
+            background-color: #6c757d; /* Cinza que combina com ambos os modos */
+        }
+
+        #toggle-mode-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* Ajuste para o modo escuro */
+        .dark-mode #toggle-mode-btn {
+            background-color: #f8f9fa; /* Cinza claro para o modo escuro */
+            color: #343a40;
+        }
+
+        .dark-mode #toggle-mode-btn:hover {
+            background-color: #e2e6ea;
+        }
+
+        .table-container {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #2b957a; /* Cor alterada para combinar com o esquema */
+            color: white;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Ajuste para o modo escuro */
+        .dark-mode th {
+            background-color: #1e6754; /* Versão mais escura para o modo escuro */
+        }
+
+        .dark-mode tbody tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+
+        tbody tr {
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: aparecer 0.3s forwards;
+        }
+
+        @keyframes aparecer {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert {
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+            border-radius: 5px;
+        }
+
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilos para o cabeçalho e rodapé */
+        header, footer {
+            background-color: #2b957a;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        header img {
+            height: 60px;
+            width: auto;
+            margin-right: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+
+        /* Ajuste para o modo escuro */
+        .dark-mode header, .dark-mode footer {
+            background-color: #000000; /* Preto para o modo escuro */
+        }
+
+        .dark-mode header .logo-light {
+            display: none;
+        }
+
+        .dark-mode header .logo-dark {
+            display: block;
+        }
+
+        header .logo-dark {
+            display: none;
+        }
+
+        /* Estilos para o menu lateral */
+        .sidebar {
+            position: fixed;
+            left: -200px; /* Inicialmente escondido */
+            top: 80px; /* Alinhado com o topo do cabeçalho */
+            bottom: 0;
+            width: 200px;
+            background-color: #515253;
+            padding: 20px;
+            padding-top: 60px; /* Espaço adicional no topo para o botão */
+            overflow-y: auto;
+            transition: left 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px; /* Espaço adicional no topo da lista */
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: #fff; /* Alterado para branco para melhor contraste */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #2b957a; /* Mantido a cor de hover anterior */
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+            font-size: 1.2em;
+            width: 20px; /* Largura fixa para alinhar os ícones */
+            text-align: center; /* Centraliza os ícones */
+        }
+
+        /* Botão para abrir/fechar o menu */
+        #toggle-sidebar {
+            position: fixed;
+            left: 10px;
+            top: 90px; /* Ajustado para ficar logo abaixo do cabeçalho */
+            z-index: 1001;
+            background-color: #2b957a;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #toggle-sidebar:hover {
+            background-color: #217a63; /* Cor mais escura para o efeito hover */
+        }
+
+        /* Ajuste para o modo escuro */
+        .dark-mode #toggle-sidebar {
+            background-color: #ff6600; /* Cor contrastante para o modo escuro */
+        }
+
+        .dark-mode #toggle-sidebar:hover {
+            background-color: #e65c00; /* Cor mais escura para o efeito hover no modo escuro */
+        }
+
+        /* Ajuste no container principal */
+        .container {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .container.sidebar-open {
+            margin-left: 220px;
+        }
+
+        /* Ajuste para o modo escuro */
+        .dark-mode .sidebar {
+            background-color: #333; /* Versão mais escura para o modo escuro */
+        }
+
+        /* Estilos para os botões de exportação */
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-excel {
+            background-color: #217346; /* Verde do Excel */
+        }
+
+        .btn-excel:hover {
+            background-color: #1e6339;
+        }
+
+        .btn-pdf {
+            background-color: #f44336; /* Vermelho fraco */
+        }
+
+        .btn-pdf:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Ajustes para o modo escuro */
+        .dark-mode header, .dark-mode footer {
+            background-color: #1e6754; /* Versão mais escura de #2b957a para o modo escuro */
+        }
+
+        .dark-mode .sidebar {
+            background-color: #333; /* Versão mais escura para o modo escuro */
+        }
+
+        .dark-mode #toggle-sidebar {
+            background-color: #ff6600; /* Cor contrastante para o modo escuro */
+        }
+
+        .dark-mode #toggle-sidebar:hover {
+            background-color: #e65c00;
+        }
+
+        .dark-mode table {
+            color: #fff;
+        }
+
+        .dark-mode th {
+            background-color: #1e6754;
+        }
+
+        .dark-mode td {
+            border-color: #555;
+        }
+
+        .dark-mode tbody tr:nth-child(even) {
+            background-color: #3a3a3a;
+        }
+
+        .dark-mode tbody tr:nth-child(odd) {
+            background-color: #333;
+        }
+
+        .dark-mode .btn-group button {
+            background-color: #555;
+        }
+
+        .dark-mode .btn-group button:hover {
+            background-color: #666;
+        }
+
+        .dark-mode #adicionar-btn {
+            background-color: #1e7e34;
+        }
+
+        .dark-mode #adicionar-btn:hover {
+            background-color: #218838;
+        }
+
+        .dark-mode #carregar-btn {
+            background-color: #138496;
+        }
+
+        .dark-mode #carregar-btn:hover {
+            background-color: #17a2b8;
+        }
+
+        .dark-mode .btn-excel {
+            background-color: #1e6339;
+        }
+
+        .dark-mode .btn-excel:hover {
+            background-color: #217346;
+        }
+
+        .dark-mode .btn-pdf {
+            background-color: #d32f2f;
+        }
+
+        .dark-mode .btn-pdf:hover {
+            background-color: #f44336;
+        }
+
+        #toggle-mode-icon {
+            position: absolute;
+            right: 20px;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #toggle-mode-icon:hover {
+            color: #f0f0f0;
+        }
+
+        .dark-mode #toggle-mode-icon {
+            color: #f0f0f0;
+        }
+
+        .dark-mode #toggle-mode-icon:hover {
+            color: #ffffff;
+        }
+
+        /* Remova ou comente os estilos anteriores do #toggle-mode-btn */
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://images2.imgbox.com/63/e9/GvCxNKyI_o.png" alt="Logo claro" class="logo-light">
+        <img src="https://images2.imgbox.com/ce/81/0m6Z2Q9Q_o.png" alt="Logo escuro" class="logo-dark">
+        <h1>Programação de Embarque</h1>
+        <i id="toggle-mode-icon" class="fas fa-sun"></i>
+    </header>
+
+    <button id="toggle-sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="Programacao.html"><i class="fas fa-file-alt"></i> Programação</a></li>
+            <li><a href="pages/dashboard.html"><i class="fas fa-chart-bar"></i> Dashboards</a></li>
+            <li><a href="pages/configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="pages/administracao.html"><i class="fas fa-users-cog"></i> Administração</a></li>
+            <li><a href="pages/login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="form-grid">
+            <div class="form-item">
+                <label for="data">Data:</label>
+                <input type="date" id="data">
+            </div>
+
+            <div class="form-item">
+                <label for="colaborador">Colaborador:</label>
+                <select id="colaborador">
+                    <option value="ABDIEL DAVID MORAES DE JESUS">ABDIEL DAVID MORAES DE JESUS</option>
+                    <option value="ABEL MEDEIROS DE OLIVEIRA">ABEL MEDEIROS DE OLIVEIRA</option>
+                    <option value="ABRAAO CAMPELO CONCEICAO ">ABRAAO CAMPELO CONCEICAO</option>
+                    <option value="ADELAIR VENANCIO XAVIER ">ADELAIR VENANCIO XAVIER</option>
+                    <option value="ADENILTON NEVES PEREIRA">ADENILTON NEVES PEREIRA</option>
+                    <option value="AFONSO LUGATO JUNIOR">AFONSO LUGATO JUNIOR</option>
+                    <option value="AGUINEL HENRIQUE DE MEIRA GONÇALVES">AGUINEL HENRIQUE DE MEIRA GONÇALVES</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="funcao">Função:</label>
+                <select id="funcao">
+                    <option value="Coordenador">Coordenador</option>
+                    <option value="Classificador">Classificador</option>
+                    <option value="Suporte">Suporte</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="ordemServico">Ordem de Serviço:</label>
+                <input type="text" id="ordemServico">
+            </div>
+
+            <div class="form-item">
+                <label for="cliente">Cliente:</label>
+                <select id="cliente">
+                    <option value="ADM">ADM</option>
+                    <option value="BUNGE">BUNGE</option>
+                    <option value="COFCO">COFCO</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="tipo">Tipo:</label>
+                <select id="tipo">
+                    <option value="Efetivo">Efetivo</option>
+                    <option value="Safrista">Safrista</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="local">Local Região:</label>
+                <input type="text" id="local">
+            </div>
+
+            <div class="form-item">
+                <label for="origem">Origem: Fazenda ou Armazém:</label>
+                <input type="text" id="origem">
+            </div>
+
+            <div class="form-item">
+                <label for="produto">Produto:</label>
+                <select id="produto">
+                    <option value="Milho">Milho</option>
+                    <option value="Soja">Soja</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="ogm">OGM / Aflatoxina:</label>
+                <select id="ogm">
+                    <option value="Declarada">Declarada</option>
+                    <option value="Testar">Testar</option>
+                    <option value="Não Testar">Não Testar</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="destino">Destino da Carga:</label>
+                <input type="text" id="destino">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button id="adicionar-btn" onclick="adicionarLinha()">
+                <i class="fas fa-plus"></i> Adicionar
+            </button>
+            <button id="carregar-btn" onclick="carregarDados()">
+                <i class="fas fa-download"></i> Carregar Dados
+            </button>
+        </div>
+
+        <div id="alert-box" class="alert"></div>
+
+        <div class="table-container">
+            <table id="tabela">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Colaborador</th>
+                        <th>Função</th>
+                        <th>Cliente</th>
+                        <th>Local Região</th>
+                        <th>Origem: Fazenda ou Armazém</th>
+                        <th>Produto</th>
+                        <th>OGM / Aflatoxina</th>
+                        <th>Destino da Carga</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-corpo">
+                    <!-- Dados da tabela serão adicionados aqui -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btn-group" style="margin-top: 20px;">
+            <button class="btn-excel" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar para Excel</button>
+            <button class="btn-pdf" onclick="exportarPDF()"><i class="fas fa-file-pdf"></i> Exportar para PDF</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Walison Moraes/New Ceres. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        function showAlert(type, message) {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.className = `alert ${type}`;
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 3000);
+        }
+
+        function adicionarLinha() {
+            const data = document.getElementById('data').value;
+            const colaborador = document.getElementById('colaborador').value;
+            const funcao = document.getElementById('funcao').value;
+            const ordemServico = document.getElementById('ordemServico').value;
+            const cliente = document.getElementById('cliente').value;
+            const local = document.getElementById('local').value;
+            const origem = document.getElementById('origem').value;
+            const produto = document.getElementById('produto').value;
+            const ogm = document.getElementById('ogm').value;
+            const destino = document.getElementById('destino').value;
+
+            if (!data || !colaborador || !funcao || !ordemServico || !cliente || !local || !origem || !produto || !ogm || !destino) {
+                showAlert('error', 'Por favor, preencha todos os campos.');
+                return;
+            }
+
+            const tabelaCorpo = document.getElementById('tabela-corpo');
+            const novaLinha = document.createElement('tr');
+
+            novaLinha.innerHTML = `
+                <td>${data}</td>
+                <td>${colaborador}</td>
+                <td>${funcao}</td>
+                <td>${cliente}</td>
+                <td>${local}</td>
+                <td>${origem}</td>
+                <td>${produto}</td>
+                <td>${ogm}</td>
+                <td>${destino}</td>
+            `;
+
+            tabelaCorpo.appendChild(novaLinha);
+
+            document.getElementById('data').value = '';
+            document.getElementById('ordemServico').value = '';
+            document.getElementById('local').value = '';
+            document.getElementById('origem').value = '';
+            document.getElementById('destino').value = '';
+
+            showAlert('success', 'Dados adicionados com sucesso!');
+        }
+
+        function carregarDados() {
+            showAlert('success', 'Dados carregados com sucesso!');
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('toggle-mode-icon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+
+        function exportarExcel() {
+            const tabela = document.getElementById('tabela');
+            const wb = XLSX.utils.table_to_book(tabela, {sheet: "Sheet1"});
+            XLSX.writeFile(wb, 'tabela_embarque.xlsx');
+        }
+
+        function exportarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.autoTable({
+                html: '#tabela', 
+                theme: 'grid',
+                margin: { top: 20 },
+                styles: { fontSize: 8 }
+            });
+            doc.save('tabela_embarque.pdf');
+        }
+
+        // Adicione este evento de carregamento da página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicialize quaisquer configurações necessárias aqui
+        });
+
+        // Melhore a função de alternância do menu lateral
+        document.getElementById('toggle-sidebar').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const container = document.querySelector('.container');
+            const icon = this.querySelector('i');
+
+            sidebar.classList.toggle('open');
+            container.classList.toggle('sidebar-open');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        // Melhore o redirecionamento para a página de login
+        document.querySelector('.sidebar a[href="login.html"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'login.html';
+        });
+
+        // Adicione este trecho no final do seu script
+        document.addEventListener('DOMContentLoaded', function() {
+            const dashboardLink = document.querySelector('.sidebar a[href="dashboard.html"]');
+            dashboardLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'dashboard.html';
+            });
+        });
+
+        // Adicione este event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('toggle-mode-icon').addEventListener('click', toggleMode);
+        });
+    </script>
+</body>
+</html>

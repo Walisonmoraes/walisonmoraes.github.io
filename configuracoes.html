@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações do Sistema</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: background-color 0.3s;
+            margin-top: 80px;
+            margin-bottom: 60px;
+            margin-left: 220px;
+        }
+
+        .dark-mode .container {
+            background-color: #444;
+        }
+
+        header {
+            background-color: #2b957a;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        header img {
+            height: 60px;
+            width: auto;
+            margin-right: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -200px;
+            top: 80px;
+            bottom: 0;
+            width: 200px;
+            background-color: #515253;
+            padding: 20px;
+            overflow-y: auto;
+            transition: left 0.3s ease-in-out;
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #2b957a;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+        }
+
+        #toggle-sidebar {
+            position: fixed;
+            left: 10px;
+            top: 90px;
+            z-index: 1001;
+            background-color: #2b957a;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #toggle-sidebar:hover {
+            background-color: #217a63;
+        }
+
+        #toggle-mode-icon {
+            position: absolute;
+            right: 20px;
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #toggle-mode-icon:hover {
+            color: #f0f0f0;
+        }
+
+        .config-section {
+            margin-bottom: 30px;
+        }
+
+        .config-section h2 {
+            margin-bottom: 15px;
+            color: #2b957a;
+        }
+
+        .config-item {
+            margin-bottom: 15px;
+        }
+
+        .config-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .config-item input[type="text"],
+        .config-item input[type="number"],
+        .config-item select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .config-item input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        button {
+            background-color: #2b957a;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #217a63;
+        }
+
+        footer {
+            background-color: #2b957a;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .dark-mode footer {
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://images2.imgbox.com/63/e9/GvCxNKyI_o.png" alt="Logo claro" class="logo-light">
+        <img src="https://images2.imgbox.com/ce/81/0m6Z2Q9Q_o.png" alt="Logo escuro" class="logo-dark">
+        <h1>Configurações do Sistema</h1>
+        <i id="toggle-mode-icon" class="fas fa-sun"></i>
+    </header>
+
+    <button id="toggle-sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="Programacao.html"><i class="fas fa-file-alt"></i> Programação</a></li>
+            <li><a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboards</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="administracao.html"><i class="fas fa-users-cog"></i> Administração</a></li>
+            <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="config-section">
+            <h2>Configurações Gerais</h2>
+            <div class="config-item">
+                <label for="company-name">Nome da Empresa:</label>
+                <input type="text" id="company-name" value="New Ceres">
+            </div>
+            <div class="config-item">
+                <label for="timezone">Fuso Horário:</label>
+                <select id="timezone">
+                    <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
+                    <option value="America/Manaus">Manaus (GMT-4)</option>
+                    <option value="America/Rio_Branco">Rio Branco (GMT-5)</option>
+                </select>
+            </div>
+            <div class="config-item">
+                <label for="language">Idioma do Sistema:</label>
+                <select id="language">
+                    <option value="pt-BR">Português (Brasil)</option>
+                    <option value="en-US">English (US)</option>
+                    <option value="es-ES">Español</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <h2>Configurações de Notificações</h2>
+            <div class="config-item">
+                <label>
+                    <input type="checkbox" id="email-notifications" checked>
+                    Receber notificações por e-mail
+                </label>
+            </div>
+            <div class="config-item">
+                <label>
+                    <input type="checkbox" id="push-notifications">
+                    Receber notificações push
+                </label>
+            </div>
+            <div class="config-item">
+                <label for="notification-frequency">Frequência de Notificações:</label>
+                <select id="notification-frequency">
+                    <option value="realtime">Tempo real</option>
+                    <option value="daily">Diariamente</option>
+                    <option value="weekly">Semanalmente</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <h2>Configurações de Segurança</h2>
+            <div class="config-item">
+                <label>
+                    <input type="checkbox" id="two-factor-auth">
+                    Ativar autenticação de dois fatores
+                </label>
+            </div>
+            <div class="config-item">
+                <label for="session-timeout">Tempo limite da sessão (minutos):</label>
+                <input type="number" id="session-timeout" value="30" min="5" max="120">
+            </div>
+        </div>
+
+        <div class="config-section">
+            <h2>Configurações de Exportação</h2>
+            <div class="config-item">
+                <label for="default-export-format">Formato padrão de exportação:</label>
+                <select id="default-export-format">
+                    <option value="excel">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+            <div class="config-item">
+                <label>
+                    <input type="checkbox" id="include-headers" checked>
+                    Incluir cabeçalhos nas exportações
+                </label>
+            </div>
+        </div>
+
+        <button onclick="salvarConfiguracoes()">Salvar Configurações</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Walison Moraes/New Ceres. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const container = document.querySelector('.container');
+            sidebar.classList.toggle('open');
+            container.classList.toggle('sidebar-open');
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('toggle-mode-icon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+
+        function salvarConfiguracoes() {
+            // Aqui você implementaria a lógica para salvar as configurações
+            alert('Configurações salvas com sucesso!');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('toggle-sidebar').addEventListener('click', toggleSidebar);
+            document.getElementById('toggle-mode-icon').addEventListener('click', toggleMode);
+        });
+    </script>
+</body>
+</html>

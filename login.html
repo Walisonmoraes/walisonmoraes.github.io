@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #333;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s;
+        }
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+        #toggle-mode-btn {
+            background-color: transparent;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            background-color: #444;
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 30px;
+            max-width: 200px;
+            height: auto;
+        }
+        .logo-dark {
+            display: block;
+        }
+        .logo-light {
+            display: none;
+        }
+        .light-mode .logo-dark {
+            display: none;
+        }
+        .light-mode .logo-light {
+            display: block;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #666;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #555;
+            color: #fff;
+            font-size: 16px;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #4cd3a5;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        button[type="submit"]:hover {
+            background-color: #3ab389;
+        }
+        .light-mode {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .light-mode .login-container {
+            background-color: #fff;
+        }
+        .light-mode input {
+            background-color: #fff;
+            color: #333;
+            border-color: #ddd;
+        }
+        .light-mode #toggle-mode-btn {
+            color: #333;
+        }
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .forgot-password a {
+            color: #4cd3a5;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        .light-mode .forgot-password a {
+            color: #2b957a;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button id="toggle-mode-btn" onclick="toggleMode()">
+            <i id="toggle-mode-icon" class="fas fa-sun"></i>
+        </button>
+    </div>
+    <div class="main-content">
+        <div class="login-container">
+            <img src="https://images2.imgbox.com/ce/81/0m6Z2Q9Q_o.png" alt="Logo Modo Escuro" class="logo logo-dark">
+            <img src="https://images2.imgbox.com/63/e9/GvCxNKyI_o.png" alt="Logo Modo Claro" class="logo logo-light">
+            <form>
+                <input type="text" placeholder="Usuário" required>
+                <input type="password" placeholder="Senha" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <div class="forgot-password">
+                <a href="#">Perdeu a senha?</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('toggle-mode-icon');
+            if (document.body.classList.contains('light-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+    </script>
+</body>
+</html>

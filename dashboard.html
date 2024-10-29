@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Programação de Embarque</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: background-color 0.3s;
+            margin-top: 80px;
+            margin-bottom: 60px;
+            margin-left: 220px;
+        }
+
+        .dark-mode .container {
+            background-color: #444;
+        }
+
+        header {
+            background-color: #2b957a;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        header img {
+            height: 60px;
+            width: auto;
+            margin-right: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -200px;
+            top: 80px;
+            bottom: 0;
+            width: 200px;
+            background-color: #515253;
+            padding: 20px;
+            padding-top: 60px;
+            overflow-y: auto;
+            transition: left 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #2b957a;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+        }
+
+        #toggle-sidebar {
+            position: fixed;
+            left: 10px;
+            top: 90px;
+            z-index: 1001;
+            background-color: #2b957a;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #toggle-sidebar:hover {
+            background-color: #217a63;
+        }
+
+        .dark-mode #toggle-sidebar {
+            background-color: #ff6600;
+        }
+
+        .dark-mode #toggle-sidebar:hover {
+            background-color: #e65c00;
+        }
+
+        .container.sidebar-open {
+            margin-left: 220px;
+        }
+
+        .dark-mode .sidebar {
+            background-color: #333;
+        }
+
+        /* Estilos específicos para o dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .dark-mode .card {
+            background-color: #555;
+        }
+
+        .card h2 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #2b957a;
+        }
+
+        .dark-mode .card h2 {
+            color: #4ecdc4;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filters select, .filters input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .dark-mode .filters select, .dark-mode .filters input {
+            background-color: #444;
+            color: #fff;
+            border-color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                left: -220px;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            #toggle-sidebar {
+                display: block;
+            }
+
+            .container.sidebar-open {
+                margin-left: 0;
+            }
+        }
+
+        #toggle-mode-icon {
+            position: absolute;
+            right: 20px;
+            color: white;
+            font-size: 1.5em; /* Este é o tamanho do ícone */
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #toggle-mode-icon:hover {
+            color: #f0f0f0;
+        }
+
+        .dark-mode #toggle-mode-icon {
+            color: #f0f0f0;
+        }
+
+        .dark-mode #toggle-mode-icon:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://images2.imgbox.com/63/e9/GvCxNKyI_o.png" alt="Logo claro" class="logo-light">
+        <img src="https://images2.imgbox.com/ce/81/0m6Z2Q9Q_o.png" alt="Logo escuro" class="logo-dark">
+        <h1>Dashboard de Programação de Embarque</h1>
+        <i id="toggle-mode-icon" class="fas fa-sun"></i>
+    </header>
+
+    <button id="toggle-sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="../Programacao.html"><i class="fas fa-file-alt"></i> Programação</a></li>
+            <li><a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboards</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="administracao.html"><i class="fas fa-users-cog"></i> Administração</a></li>
+            <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="filters">
+            <select id="filter-month">
+                <option value="">Todos os Meses</option>
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Março</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8">Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+            </select>
+            <select id="filter-year">
+                <option value="">Todos os Anos</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+            </select>
+            <select id="filter-region">
+                <option value="">Todas as Regiões</option>
+                <option value="Norte">Norte</option>
+                <option value="Nordeste">Nordeste</option>
+                <option value="Centro-Oeste">Centro-Oeste</option>
+                <option value="Sudeste">Sudeste</option>
+                <option value="Sul">Sul</option>
+            </select>
+            <input type="date" id="filter-date" placeholder="Data Específica">
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>Total de Colaboradores Escalados</h2>
+                <canvas id="colaboradoresChart"></canvas>
+            </div>
+            <div class="card">
+                <h2>Ordens de Serviço por Região</h2>
+                <canvas id="ordensServicoChart"></canvas>
+            </div>
+            <div class="card">
+                <h2>Distribuição de Funções</h2>
+                <canvas id="funcoesChart"></canvas>
+            </div>
+            <div class="card">
+                <h2>Produtos Embarcados</h2>
+                <canvas id="produtosChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados simulados (substitua por dados reais da sua planilha)
+        const dadosSimulados = {
+            colaboradores: [150, 180, 200, 170, 220, 190],
+            ordensServico: {
+                'Norte': 50,
+                'Nordeste': 80,
+                'Centro-Oeste': 120,
+                'Sudeste': 90,
+                'Sul': 60
+            },
+            funcoes: {
+                'Coordenador': 30,
+                'Classificador': 100,
+                'Suporte': 70
+            },
+            produtos: {
+                'Milho': 60,
+                'Soja': 40
+            }
+        };
+
+        function criarGraficos() {
+            // Implementação dos gráficos (mantenha o código existente)
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('toggle-mode-icon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const container = document.querySelector('.container');
+            const toggleBtn = document.getElementById('toggle-sidebar');
+            
+            sidebar.classList.toggle('open');
+            container.classList.toggle('sidebar-open');
+            
+            toggleBtn.innerHTML = sidebar.classList.contains('open') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            criarGraficos();
+            document.getElementById('toggle-mode-icon').addEventListener('click', toggleDarkMode);
+            document.getElementById('toggle-sidebar').addEventListener('click', toggleSidebar);
+        });
+
+        // Adicione event listeners para os filtros
+        document.getElementById('filter-month').addEventListener('change', atualizarDados);
+        document.getElementById('filter-year').addEventListener('change', atualizarDados);
+        document.getElementById('filter-region').addEventListener('change', atualizarDados);
+        document.getElementById('filter-date').addEventListener('change', atualizarDados);
+
+        function atualizarDados() {
+            console.log('Atualizando dados...');
+            criarGraficos();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração do Sistema</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: background-color 0.3s;
+            margin-top: 80px;
+            margin-bottom: 60px;
+            margin-left: 220px;
+        }
+
+        .dark-mode .container {
+            background-color: #444;
+        }
+
+        header {
+            background-color: #2b957a;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        header img {
+            height: 60px;
+            width: auto;
+            margin-right: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -200px;
+            top: 80px;
+            bottom: 0;
+            width: 200px;
+            background-color: #515253;
+            padding: 20px;
+            overflow-y: auto;
+            transition: left 0.3s ease-in-out;
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #2b957a;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+        }
+
+        #toggle-sidebar {
+            position: fixed;
+            left: 10px;
+            top: 90px;
+            z-index: 1001;
+            background-color: #2b957a;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #toggle-sidebar:hover {
+            background-color: #217a63;
+        }
+
+        #toggle-mode-icon {
+            position: absolute;
+            right: 20px;
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #toggle-mode-icon:hover {
+            color: #f0f0f0;
+        }
+
+        .admin-section {
+            margin-bottom: 30px;
+        }
+
+        .admin-section h2 {
+            margin-bottom: 15px;
+            color: #2b957a;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        button {
+            background-color: #2b957a;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #217a63;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2b957a;
+            color: white;
+        }
+
+        footer {
+            background-color: #2b957a;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .dark-mode footer {
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://images2.imgbox.com/63/e9/GvCxNKyI_o.png" alt="Logo claro" class="logo-light">
+        <img src="https://images2.imgbox.com/ce/81/0m6Z2Q9Q_o.png" alt="Logo escuro" class="logo-dark">
+        <h1>Administração do Sistema</h1>
+        <i id="toggle-mode-icon" class="fas fa-sun"></i>
+    </header>
+
+    <button id="toggle-sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="../Programacao.html"><i class="fas fa-file-alt"></i> Programação</a></li>
+            <li><a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboards</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="administracao.html"><i class="fas fa-users-cog"></i> Administração</a></li>
+            <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="admin-section">
+            <h2>Gerenciamento de Usuários</h2>
+            <form id="user-form">
+                <div class="form-group">
+                    <label for="username">Nome de Usuário:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Função:</label>
+                    <select id="role">
+                        <option value="admin">Administrador</option>
+                        <option value="manager">Gerente</option>
+                        <option value="user">Usuário</option>
+                    </select>
+                </div>
+                <button type="submit">Criar Usuário</button>
+            </form>
+        </div>
+
+        <div class="admin-section">
+            <h2>Lista de Usuários</h2>
+            <table id="user-table">
+                <thead>
+                    <tr>
+                        <th>Nome de Usuário</th>
+                        <th>E-mail</th>
+                        <th>Função</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Usuários serão adicionados aqui dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-section">
+            <h2>Gerenciamento de Permissões</h2>
+            <form id="permission-form">
+                <div class="form-group">
+                    <label for="user-select">Selecione o Usuário:</label>
+                    <select id="user-select">
+                        <!-- Opções serão adicionadas dinamicamente -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Permissões:</label>
+                    <div>
+                        <input type="checkbox" id="perm-view" name="permissions" value="view">
+                        <label for="perm-view">Visualizar</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="perm-edit" name="permissions" value="edit">
+                        <label for="perm-edit">Editar</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="perm-delete" name="permissions" value="delete">
+                        <label for="perm-delete">Excluir</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="perm-admin" name="permissions" value="admin">
+                        <label for="perm-admin">Administrar</label>
+                    </div>
+                </div>
+                <button type="submit">Atualizar Permissões</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Walison Moraes/New Ceres. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const container = document.querySelector('.container');
+            sidebar.classList.toggle('open');
+            container.classList.toggle('sidebar-open');
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('toggle-mode-icon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+
+        function addUser(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+
+            const tableBody = document.querySelector('#user-table tbody');
+            const newRow = tableBody.insertRow();
+            newRow.innerHTML = `
+                <td>${username}</td>
+                <td>${email}</td>
+                <td>${role}</td>
+                <td>
+                    <button onclick="editUser(this)">Editar</button>
+                    <button onclick="deleteUser(this)">Excluir</button>
+                </td>
+            `;
+
+            // Limpar o formulário
+            document.getElementById('user-form').reset();
+
+            // Atualizar o select de usuários no formulário de permissões
+            updateUserSelect();
+        }
+
+        function editUser(button) {
+            const row = button.closest('tr');
+            const cells = row.cells;
+            
+            document.getElementById('username').value = cells[0].textContent;
+            document.getElementById('email').value = cells[1].textContent;
+            document.getElementById('role').value = cells[2].textContent.toLowerCase();
+
+            // Remover a linha atual
+            row.remove();
+        }
+
+        function deleteUser(button) {
+            if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                const row = button.closest('tr');
+                row.remove();
+                updateUserSelect();
+            }
+        }
+
+        function updateUserSelect() {
+            const userSelect = document.getElementById('user-select');
+            userSelect.innerHTML = '';
+            const users = document.querySelectorAll('#user-table tbody tr');
+            users.forEach(user => {
+                const username = user.cells[0].textContent;
+                const option = document.createElement('option');
+                option.value = username;
+                option.textContent = username;
+                userSelect.appendChild(option);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('toggle-sidebar').addEventListener('click', toggleSidebar);
+            document.getElementById('toggle-mode-icon').addEventListener('click', toggleMode);
+            document.getElementById('user-form').addEventListener('submit', addUser);
+            document.getElementById('permission-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                alert('Permissões atualizadas com sucesso!');
+            });
+        });
+    </script>
+</body>
+</html>
